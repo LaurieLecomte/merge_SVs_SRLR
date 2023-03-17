@@ -31,7 +31,7 @@ module load bcftools/1.13
 sed -E "s/\;STRANDS\=\?\?//"  $MERGED_VCF > $FILT_DIR/"$(basename -s .vcf $MERGED_VCF)".tmp 
 
 ## Remove all optional fields added by Jasmine and Iris and sort
-bcftools annotate -x ^SVTYPE,SVLEN,END,SUPP,SUPP_VEC $FILT_DIR/"$(basename -s .vcf $MERGED_VCF)".tmp > $FILT_DIR/"$(basename -s .vcf $MERGED_VCF)".vcf
+bcftools annotate -x ^INFO/SVTYPE,INFO/SVLEN,INFO/END,INFO/SUPP,INFO/SUPP_VEC $FILT_DIR/"$(basename -s .vcf $MERGED_VCF)".tmp > $FILT_DIR/"$(basename -s .vcf $MERGED_VCF)".ready.vcf
 
 # Clean up
 rm $FILT_DIR/"$(basename -s .vcf $MERGED_VCF)".tmp
