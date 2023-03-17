@@ -1,4 +1,5 @@
-# Summarize and plot merged SVs from short reads 
+# Summarize and plot merged SVs from both SR and LR data
+
 # This script is made to be executed by the 01_scripts/utils/summarize_plot.sh script
 library(ggplot2)
 library(ggpubr)
