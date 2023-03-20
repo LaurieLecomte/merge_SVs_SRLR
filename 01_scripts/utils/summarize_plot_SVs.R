@@ -66,10 +66,17 @@ for (i in 1:length(svtypes)) {
   cols_svtypes[i] <- hex_svtypes[i]
 }
 
+## Reorder platform callers
+reordered_platform <- c('SR', 'LR', 'LR + SR')
+
+merged$platform_reordered <- factor(merged$platform, 
+                                   levels = reordered_platform)
+
+
 
 # Plot by data type and sv type
 ggplot(data = merged) +
-  geom_bar(aes(x = platform, fill = SVTYPE)) + 
+  geom_bar(aes(x = platform_reordered, fill = SVTYPE)) + 
   theme(
     ## Plot title
     plot.title = element_text(size = 10, face = 'bold', hjust = 0.5),
@@ -90,6 +97,57 @@ ggplot(data = merged) +
     title = "Merged SV count by type and platform"
   ) + 
   scale_fill_manual(values = cols_svtypes)
+
+# Plot by data type and size bins
+ggplot(data = merged) +
+  geom_bar(aes(x = SVLEN_bin, fill = platform_reordered)) + 
+  theme(
+    ## Plot title
+    plot.title = element_text(size = 10, face = 'bold', hjust = 0.5),
+    ## Axis
+    axis.text.x = element_text(angle = 45, size = 6, hjust = 1),
+    axis.text.y = element_text(size = 6, hjust = 1),
+    axis.title.x = element_text(size = 8),
+    axis.title.y = element_text(size = 8),
+    ## Legend
+    legend.title = element_text(size = 8, hjust = 0.5),
+    legend.text = element_text(size = 7),
+    legend.key.size = unit(5, 'mm')
+  ) +
+  labs(
+    x = "Data type",
+    y = "SV count",
+    fill = "Data type",
+    title = "Merged SV count by size bins and platform"
+  ) + 
+  scale_fill_viridis_d(option = "B")
+
+# Plot by data type and sv type, with size bins
+ggplot(data = merged) +
+  #facet_wrap(~platform) +
+  facet_grid(rows = vars(platform_reordered), scales = 'free_y') +
+  geom_bar(aes(x = SVLEN_bin, fill = SVTYPE)) + 
+  theme(
+    ## Plot title
+    plot.title = element_text(size = 10, face = 'bold', hjust = 0.5),
+    ## Axis
+    axis.text.x = element_text(angle = 45, size = 6, hjust = 1),
+    axis.text.y = element_text(size = 6, hjust = 1),
+    axis.title.x = element_text(size = 8),
+    axis.title.y = element_text(size = 8),
+    ## Legend
+    legend.title = element_text(size = 8, hjust = 0.5),
+    legend.text = element_text(size = 7),
+    legend.key.size = unit(5, 'mm')
+  ) +
+  labs(
+    x = "SV size (bp)",
+    y = "SV count",
+    fill = "SV type",
+    title = "Merged SV count by size bins, types and platform"
+  ) + 
+  scale_fill_manual(values = cols_svtypes)
+
 
 
 # 4. Summarize by table ---------------------------------------------------
