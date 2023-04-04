@@ -75,6 +75,7 @@ merged$platform_reordered <- factor(merged$platform,
 
 
 # Plot by data type and sv type
+type_platform <- 
 ggplot(data = merged) +
   geom_bar(aes(x = platform_reordered, fill = SVTYPE)) + 
   theme(
@@ -98,7 +99,15 @@ ggplot(data = merged) +
   ) + 
   scale_fill_manual(values = cols_svtypes)
 
+
+saveRDS(type_platform, file = paste0(unlist(strsplit(MERGED, split = '.table')), '.corrected_platform_type_plot.rds'))
+jpeg(file = paste0(unlist(strsplit(MERGED, split = '.table')), '.corrected_platform_type_plot.jpg'))
+type_platform
+dev.off()
+
+
 # Plot by data type and size bins
+type_size_bins <- 
 ggplot(data = merged) +
   geom_bar(aes(x = SVLEN_bin, fill = platform_reordered)) + 
   theme(
@@ -122,7 +131,14 @@ ggplot(data = merged) +
   ) + 
   scale_fill_viridis_d(option = "B")
 
+saveRDS(type_size_bins, file = paste0(unlist(strsplit(MERGED, split = '.table')), '.corrected_platform_type_bins_plot.rds'))
+jpeg(file = paste0(unlist(strsplit(MERGED, split = '.table')), '.corrected_platform_type_bins_plot.jpg'))
+type_size_bins
+dev.off()
+
+
 # Plot by data type and sv type, with size bins
+bins_platform_types <- 
 ggplot(data = merged) +
   #facet_wrap(~platform) +
   facet_grid(rows = vars(platform_reordered), scales = 'free_y') +
@@ -148,6 +164,11 @@ ggplot(data = merged) +
   ) + 
   scale_fill_manual(values = cols_svtypes)
 
+
+saveRDS(bins_platform_types, file = paste0(unlist(strsplit(MERGED, split = '.table')), '.corrected_bins_platform_type_plot.rds'))
+jpeg(file = paste0(unlist(strsplit(MERGED, split = '.table')), '.corrected_bins_platform_type_plot.jpg'))
+bins_platform_types
+dev.off()
 
 
 # 4. Summarize by table ---------------------------------------------------
