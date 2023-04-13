@@ -22,20 +22,38 @@ merged[, c('POS', 'SVLEN', 'END', 'SUPP')] <- sapply(merged[, c('POS', 'SVLEN', 
                                                      as.numeric)
 
 # Convert SV lengths to num and bins
-SVLEN_breaks <- c(-Inf, 50, 100, 250, 500, 1000, 2500, 5000, 10000, Inf)
-SVLEN_names <- c('[0-50[',
-                 '[50-100[',
-                 '[100-250[',
-                 '[250-500[',
-                 '[500-1000[',
-                 '[1000-2500[',
-                 '[2500-5000[',
-                 '[5000-10000[',
-                 '[10000+')
+#SVLEN_breaks <- c(-Inf, 50, 100, 250, 500, 1000, 2500, 5000, 10000, Inf)
+#SVLEN_names <- c('[0-50[',
+#                 '[50-100[',
+#                 '[100-250[',
+#                 '[250-500[',
+#                 '[500-1000[',
+#                 '[1000-2500[',
+#                 '[2500-5000[',
+#                 '[5000-10000[',
+#                 '[10000+')
+
+#merged$SVLEN_bin <-
+#  cut(abs(merged$SVLEN), breaks = SVLEN_breaks, labels = SVLEN_names, right = FALSE)
+
+
+cuts <- c(seq(0, 950, by = 50), seq(1000, 10000, by = 1000))
+SVLEN_breaks <- c(-Inf, cuts, Inf)
+
+SVLEN_names <- vector(mode = 'character', length = (length(SVLEN_breaks) -1) )
+
+for (i in 1:length(cuts)){
+  if (i < length(cuts)){
+    SVLEN_names[i] <- print(paste0('[', cuts[i], '-', cuts[i + 1], '['))
+  } else {
+    SVLEN_names[i] <- print(paste0('[', cuts[i], '+'))
+  }
+}
 
 merged$SVLEN_bin <-
-  cut(abs(merged$SVLEN), breaks = SVLEN_breaks, labels = SVLEN_names, right = FALSE)
-
+    cut(abs(merged$SVLEN), breaks = SVLEN_breaks, labels = SVLEN_names, right = FALSE)
+  
+  
 # Add explicit platform info
 merged$platform <- sapply(X = as.character(merged$SUPP_VEC), 
                         FUN = function(x){
