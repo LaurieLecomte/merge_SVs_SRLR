@@ -37,16 +37,16 @@ merged[, c('POS', 'SVLEN', 'END', 'SUPP')] <- sapply(merged[, c('POS', 'SVLEN', 
 #  cut(abs(merged$SVLEN), breaks = SVLEN_breaks, labels = SVLEN_names, right = FALSE)
 
 
-cuts <- c(seq(0, 950, by = 50), seq(1000, 10000, by = 1000))
-SVLEN_breaks <- c(-Inf, cuts, Inf)
+cuts <- c(seq(50, 950, by = 50), seq(1000, 10000, by = 500))
+SVLEN_breaks <- c(cuts, Inf)
 
 SVLEN_names <- vector(mode = 'character', length = (length(SVLEN_breaks) -1) )
 
 for (i in 1:length(cuts)){
   if (i < length(cuts)){
-    SVLEN_names[i] <- print(paste0('[', cuts[i], '-', cuts[i + 1], '['))
+    SVLEN_names[i] <- paste0('[', cuts[i], '-', cuts[i + 1], '[')
   } else {
-    SVLEN_names[i] <- print(paste0('[', cuts[i], '+'))
+    SVLEN_names[i] <- paste0('[', cuts[i], '+')
   }
 }
 
@@ -64,6 +64,34 @@ merged$platform <- sapply(X = as.character(merged$SUPP_VEC),
                         }
 )
 
+
+# Add much finer bins
+cuts_fine <- c(seq(50, 6000, by = 10))
+SVLEN_breaks_fine <- c(cuts_fine, Inf)
+
+SVLEN_names_fine <- vector(mode = 'character', length = (length(SVLEN_breaks_fine) -1) )
+
+for (i in 1:length(cuts_fine)){
+  if (i < length(cuts_fine)){
+    SVLEN_names_fine[i] <- paste0('[', cuts_fine[i], '-', cuts_fine[i + 1], '[')
+  } else {
+    SVLEN_names_fine[i] <- paste0('[', cuts_fine[i], '+')
+  }
+}
+
+merged$SVLEN_bin_fine <-
+  cut(abs(merged$SVLEN), breaks = SVLEN_breaks_fine, labels = SVLEN_names_fine, right = FALSE)
+
+
+# Add explicit platform info
+merged$platform <- sapply(X = as.character(merged$SUPP_VEC), 
+                          FUN = function(x){
+                            switch(x,
+                                   '10' = 'LR', 
+                                   '01' = 'SR',
+                                   '11' = 'LR + SR')
+                          }
+)
 
 # 3. Plot -----------------------------------------------------------------
 # Choose fun color scheme for sv types --------------------------------
@@ -144,7 +172,7 @@ ggplot(data = merged) +
   labs(
     x = "Data type",
     y = "SV count",
-    fill = "Data type",
+    fill = "SV size (bp) ",
     title = "Merged SV count by size bins and platform"
   ) + 
   scale_fill_viridis_d(option = "B")
@@ -187,6 +215,43 @@ saveRDS(bins_platform_types, file = paste0(unlist(strsplit(MERGED, split = '.tab
 jpeg(file = paste0(unlist(strsplit(MERGED, split = '.table')), '.corrected_bins_platform_type_plot.jpg'))
 bins_platform_types
 dev.off()
+
+
+# Plot with finer size bins to see TE peaks
+bins_fine_TE <- 
+  ggplot(data = merged) +
+  #facet_wrap(~platform) +
+  #facet_grid(rows = vars(platform_reordered), scales = 'free_y') +
+  geom_bar(aes(x = SVLEN)) + 
+  theme(
+    ## Plot title
+    plot.title = element_text(size = 10, face = 'bold', hjust = 0.5),
+    ## Axis
+    axis.text.x = element_text(angle = 45, size = 6, hjust = 1),
+    #axis.text.x=element_blank(),
+    axis.text.y = element_text(size = 6, hjust = 1),
+    axis.title.x = element_text(size = 8),
+    axis.title.y = element_text(size = 8),
+    ## Legend
+    legend.title = element_text(size = 8, hjust = 0.5),
+    legend.text = element_text(size = 7),
+    legend.key.size = unit(5, 'mm')
+  ) +
+  xlim(0, 4000) + 
+  labs(
+    x = "SV size (bp)",
+    y = "SV count",
+    fill = "SV type",
+    title = "Merged SV count by size"
+  ) + 
+  scale_fill_manual(values = cols_svtypes)
+
+
+saveRDS(bins_fine_TE, file = paste0(unlist(strsplit(MERGED, split = '.table')), '.corrected_fine_TE_bins_plot.rds'))
+jpeg(file = paste0(unlist(strsplit(MERGED, split = '.table')), '.corrected_fine_TE_bins_plot.jpg'))
+bins_fine_TE
+dev.off()
+
 
 
 # 4. Summarize by table ---------------------------------------------------
